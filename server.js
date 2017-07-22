@@ -191,6 +191,7 @@ app.post('/sam/fuel/end_session', function(req, res) {
 
 app.post('/sam/fuel/add_drink', function(req, res){
   res.setHeader('Content-Type', 'text/plain');
+  console.log(req.body);
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
