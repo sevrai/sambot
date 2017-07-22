@@ -227,7 +227,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
             sessionId: session.dataValues.id
           }).then(() => {
             res.json({
-              "redirect_to_blocks": ["standby"]
+              "messages": []
             });
             res.status(200);
           })
