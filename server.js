@@ -115,7 +115,7 @@ Drink.sync({force: false}).then(() => {
 app.post('/sam/fuel/new_user', function(req, res){
   console.log(req.body);
   res.setHeader('Content-Type', 'text/plain');
-  User.findOrCreate({where: {messengerId: req.body.user_id}, defaults: {firstName: req.body.name}})
+  User.findOrCreate({where: {messengerId: req.body['messenger user id']}, defaults: {firstName: req.body['first name']}})
     .spread((user, created) => {
       console.log(user.get({
         plain: true
@@ -130,7 +130,7 @@ app.post('/sam/fuel/new_user', function(req, res){
 
 app.post('/sam/fuel/start_session', function(req, res) {
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body.user_id}, }).then(user => {
+  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
@@ -159,7 +159,7 @@ app.post('/sam/fuel/start_session', function(req, res) {
 app.post('/sam/fuel/end_session', function(req, res) {
   res.setHeader('Content-Type', 'text/plain');
   var date = new Date();
-  User.findOne({where: {messengerId: req.body.user_id}, }).then(user => {
+  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
@@ -231,7 +231,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
 
 app.post('/sam/fuel/get_resume', function(req, res) {
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body.user_id}, }).then(user => {
+  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
