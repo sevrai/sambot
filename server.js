@@ -113,7 +113,7 @@ Drink.sync({force: false}).then(() => {
 /// POST/GET methods
 
 app.post('/sam/fuel/new_user', function(req, res){
-  console.log(req.body);
+  console.log(req.body, req.body['messenger user id']);
   res.setHeader('Content-Type', 'text/plain');
   User.findOrCreate({where: {messengerId: req.body['messenger user id']}, defaults: {firstName: req.body['first name']}})
     .spread((user, created) => {
@@ -199,7 +199,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
       res.status(200);
     } else {
       Session.findOne({where: {userId: user.dataValues.id, endedAt: null}}).then((session)=>{
-        console.log(session);
+        console.log(session.dataValues);
         if(session == null) {
           res.json({
             "messages": [
@@ -245,20 +245,25 @@ app.post('/sam/fuel/get_resume', function(req, res) {
       });
       res.status(200);
     } else {
-      Session.findOne({where: {userId: user.dataValues.id}}).spread((user, created)=>{
-        console.log(user.get({
-          plain: true
-        }))
-        console.log(created);
-        var messages = []
-        if (!created) {
-          messages.push("La soirée n'est pas finie à ce que je sache ! 🙃");
-        }
-        res.json({
-          "messages": messages,
-          "redirect_to_blocks": ["standby"]
-        });
-        res.status(200);
+      Session.findOne({
+        where: {userId: user.dataValues.id},
+        order: [['createdAt', 'DESC']]
+      }).then((session)=>{
+        console.log(session.get({plain: true}))
+        Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
+          console.log(drinks[0]);
+          messages = []
+          for (var i=0; i<drinks.length; i++) {
+            messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + ' de ' + drinks[i].dataValues.alcohol_type})
+          }
+          res.json({
+            "messages": messages,
+            "redirect_to_blocks": ["standby"]
+          });
+          res.status(200);
+        })
+
+
       })
     }
   })
