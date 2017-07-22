@@ -144,7 +144,7 @@ app.post('/sam/fuel/start_session', function(req, res) {
         console.log(created);
         var messages = []
         if (!created) {
-          messages.push("La soirée n'est pas finie à ce que je sache ! 🙃");
+          messages.push("La soirée n'est pas finie à ce que je sache ! ");
         }
         res.json({
           "messages": messages,
@@ -201,7 +201,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
             "messages": [{"text": "Tu ne m'as pas prévenu que les festivités avaient commencé !"}],
             "quick_replies": [
               {
-                "title":"Yes, je me la colle 🍺",
+                "title":"Yes, je me la colle ",
                 "block_names":["Welcome message"]
               },
               {
