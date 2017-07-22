@@ -255,7 +255,7 @@ app.post('/sam/fuel/get_resume', function(req, res) {
           console.log(drinks[0]);
           messages = []
           for (var i=0; i<drinks.length; i++) {
-            messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + ' de ' + drinks[i].dataValues.alcohol_type})
+            messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + ' de ' + drinks[i].dataValues.type})
           }
           res.json({
             "messages": messages
