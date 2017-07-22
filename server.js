@@ -170,8 +170,7 @@ app.post('/sam/fuel/end_session', function(req, res) {
         console.log(count);
         if(count == 1){
           res.json({
-            "messages": [{"text": "Allez, au dodo !"}],
-            "redirect_to_blocks": ["standby"]
+            "messages": [{"text": "Allez, au dodo !"}]
           });
           res.status(200);
         } else {
@@ -188,7 +187,7 @@ app.post('/sam/fuel/end_session', function(req, res) {
 
 app.post('/sam/fuel/add_drink', function(req, res){
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body.user_id}, }).then(user => {
+  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
@@ -214,7 +213,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
             res.status(200);
         } else {
           Drink.create({
-            type: req.body.type,
+            type: req.body.alcohol_type,
             quantity: req.body.quantity,
             sessionId: session.dataValues.id
           }).then(() => {
