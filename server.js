@@ -257,8 +257,7 @@ app.post('/sam/fuel/get_resume', function(req, res) {
             messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + ' de ' + drinks[i].dataValues.alcohol_type})
           }
           res.json({
-            "messages": messages,
-            "redirect_to_blocks": ["standby"]
+            "messages": messages
           });
           res.status(200);
         })
