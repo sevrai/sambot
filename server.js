@@ -144,7 +144,7 @@ app.post('/sam/fuel/start_session', function(req, res) {
         console.log(created);
         var messages = []
         if (!created) {
-          messages.push("La soirée n'est pas finie à ce que je sache ! ");
+          messages.push({'text': "La soirée n'est pas finie à ce que je sache ! 🙃"});
         }
         res.json({
           "messages": messages,
@@ -175,8 +175,12 @@ app.post('/sam/fuel/end_session', function(req, res) {
           res.status(200);
         } else {
           res.json({
-            "messages": [{'text':"Si je ne m'abuse, la soirée est déjà finie ? 😝"}],
-            "redirect_to_blocks": ["idle"]
+            "messages": [
+              {
+                'text':"Si je ne m'abuse, la soirée est déjà finie ? 😝",
+                "redirect_to_blocks": ["idle"]
+            }],
+
           });
           res.status(200);
         }
@@ -198,17 +202,21 @@ app.post('/sam/fuel/add_drink', function(req, res){
         console.log(session);
         if(session == null) {
           res.json({
-            "messages": [{"text": "Tu ne m'as pas prévenu que les festivités avaient commencé !"}],
-            "quick_replies": [
+            "messages": [
               {
-                "title":"Yes, je me la colle ",
-                "block_names":["Welcome message"]
-              },
-              {
-                "title":"Pardon fausse manip",
-                "block_names":["idle"]
-              }
-            ]
+                "text": "Tu ne m'as pas prévenu que les festivités avaient commencé !",
+                "quick_replies": [
+                  {
+                    "title":"Yes, je me la colle 🍺",
+                    "block_names":["Welcome message"]
+                  },
+                  {
+                    "title":"Pardon fausse manip",
+                    "block_names":["idle"]
+                  }
+                ]
+              }],
+
             });
             res.status(200);
         } else {
