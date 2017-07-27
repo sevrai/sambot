@@ -176,6 +176,7 @@ function nlu_quantity(user_input) {
 
 /// POST/GET methods
 app.post('/sam/fuel/new_user', function(req, res){
+  console.log('-------- NEW-USER -------')
   console.log(req.body, req.body['messenger user id']);
   res.setHeader('Content-Type', 'text/plain');
   User.findOrCreate({where: {messengerId: req.body['messenger user id']}, defaults: {firstName: req.body['first name']}})
@@ -192,6 +193,7 @@ app.post('/sam/fuel/new_user', function(req, res){
 });
 
 app.post('/sam/fuel/start_session', function(req, res) {
+  console.log('-------- START-SESSION -------')
   res.setHeader('Content-Type', 'text/plain');
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
@@ -220,6 +222,7 @@ app.post('/sam/fuel/start_session', function(req, res) {
 });
 
 app.post('/sam/fuel/end_session', function(req, res) {
+  console.log('-------- END-SESSION -------')
   res.setHeader('Content-Type', 'text/plain');
   var date = new Date();
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
