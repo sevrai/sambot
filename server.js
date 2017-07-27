@@ -324,10 +324,10 @@ app.post('/sam/fuel/get_drinks_resume', function(req, res) {
       }).then((session)=>{
         Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
           messages = []
-          var stacked = 0;
           for (var i=0; i<drinks.length; i++) {
             var ingredients = cocktails[drinks[i].type].ingredients;
             var quantity = drinks[i].quantity;
+            var stacked = 0;
             console.log(ingredients.length);
             for (var j=0; j<ingredients.length; j++) {
               console.log(alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50)
