@@ -1,0 +1,67 @@
+# gin_tonic :
+#   name : Gin tonic
+#   variants :
+#   - label : gin tonic
+#   - label : Ginto'
+#   - label : Gin schwepps
+#   - label : Bombay tonic
+#     specifics :
+#     - name : gin
+#       brand : bombay
+#     - name : schwepps-classic
+#       brand : carrefour
+#   ingredients :
+#   - name : gin
+#     quantity : 0.34
+#     brand : (bombay)
+#   - name : schwepps-classic
+#     quantity : 0.66
+#   default_volume : 120
+#
+pure-vodka :
+  name : vodka
+  variants :
+  - label : vodka
+  - label : vodka pure
+  - label : un pur de vodka
+  ingredients :
+    - name : vodka
+      quantity : 1.0
+  default_volume : 40
+
+vodka-juice :
+  name : Vodka jus de fruit
+  variants :
+  - label : vodka pomme
+  - TODODODODODODODODO
+
+pure-whisky :
+  name : whisky
+  variants :
+  - label : whisky
+  - label : sky
+  ingredients :
+  - name : whisky
+    quantity : 1.0
+  default_volume : 40
+
+beer :
+  name : bière
+  ingredients :
+  - name : beer
+    quantity : 1.0
+  default_volume : 250
+
+pure-rum :
+  name : rhum
+  ingredients :
+  - name : rum
+    quantity : 1.0
+  default_volume : 40
+
+ti-punch :
+  name : \'ti-punch
+  ingredients :
+  - name : rum
+    quantity : 0.7
+  default_volume : 50

@@ -1,0 +1,13 @@
+conventions yaml :
+- nom de variables : nom_de_variable
+- valeur de variable : valeur-de-variable
+
+en base :
+drinks : instances de cocktails
+ ____________________________________________
+| id | session_id | cocktail_slug | quantity |
+ ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺
+drinks_attributes : options particulières des verres
+ __________________________________________________
+| id | drink_id | attribute_name | attribute_value |
+ ⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺

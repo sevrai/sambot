@@ -1,0 +1,44 @@
+rum :
+  brands :
+    saint-james :
+      name : Saint James
+      degree : 40
+      kind : default
+    trois-rivieres :
+      name : Trois Rivières
+      degree : 50
+      kind : default
+  types :
+    black-rum :
+      name : Rhum ambré
+      default_degree : 50
+    default :
+      name : Rhum
+      default_degree : 40
+whisky :
+  brands :
+    william-peel :
+      name : William Peel
+      degree : 37.5
+      kind : default
+  types :
+    default :
+      name : whisky
+      default_degree : 40.0
+vodka :
+  type :
+    default :
+      name : vodka
+      default_degree : 40.0
+beer :
+  types :
+    default :
+      name : bière
+      default_degree : 5.0
+    indian-pale-ale :
+      name : IPA
+      default_degree : 7.0
+    brown-beer :
+      name : bière brune
+      default_degree : 6.0
+  brands :

@@ -8,6 +8,7 @@ var Sequelize = require('sequelize');
 var request = require('request');
 var app = express();
 var bodyParser = require('body-parser')
+var yaml = require('node-yaml')
 
 // JSON BODY PARSER
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -22,6 +23,10 @@ app.use(function(req, res, next) {
   next();
 });
 
+var cocktails = yaml.readSync('cocktails.yaml');
+var alcohols = yaml.readSync('alcohols.yaml');
+var dico = yaml.readSync('dict.yaml');
+console.log(alcohols.whisky.types)
 //initialization of database
 const sequelize = new Sequelize('database', 'username', 'password', {
   host: 'localhost',
@@ -75,7 +80,7 @@ const Drink = sequelize.define('drinks', {
     defaultValue: 'liquide'
   },
   quantity: {
-    type: Sequelize.STRING,
+    type: Sequelize.FLOAT,
     allowNull: false,
     defaultValue: '4 cL'
   },
@@ -89,29 +94,85 @@ const Drink = sequelize.define('drinks', {
   }
 });
 
+const Alcohol = sequelize.define('alcohols', {
+  name: {
+    type: Sequelize.STRING
+  },
+  degree: {
+    type: Sequelize.FLOAT
+  }
+
+});
+
+Drink.belongsTo(Alcohol);
+
 User.sync({force: false}).then(() => {
   // Table created
   User.findAll().then(users => {
-    console.log(users)
+    // console.log(users)
   });
 });
 
 Session.sync({force: false}).then(() => {
   // Table created
   Session.findAll().then(sessions => {
-    console.log(sessions)
+    // console.log(sessions)
   });
 });
 
 Drink.sync({force: false}).then(() => {
   // Table created
   Drink.findAll().then(drinks => {
-    console.log(drinks)
+    // console.log(drinks)
   });
 });
 
-/// POST/GET methods
+Alcohol.sync({force: false}).then(() => {
+  Alcohol.create({
+    name: 'vodka',
+    degree: 37.5
+  }).then();
+  Alcohol.create({
+    name: 'champagne',
+    degree: 12.5
+  }).then();
+  Alcohol.create({
+    name: 'coca',
+    degree: 0
+  }).then();
+});
 
+////// misc functions
+function first_check(req, res, callback) {
+  res.setHeader('Content-Type', 'text/plain');
+  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+    if (user == null) {
+      res.json({
+        "redirect_to_blocks": ["Welcome message"]
+      });
+      res.status(200);
+    } else {
+      callback(req, res, user);
+    }
+  });
+}
+function nlu_cocktail(user_input) {
+  var keys = Object.keys(dico);
+  console.log(keys)
+  var result = '';
+  for (var i=0; i<keys.length; i++) {
+    if (dico[keys[i]].includes(user_input)) {
+      result = keys[i];
+    }
+  }
+  return result
+}
+function nlu_quantity(user_input) {
+  console.log(user_input)
+  return parseFloat(user_input)
+}
+
+/// POST/GET methods
 app.post('/sam/fuel/new_user', function(req, res){
   console.log(req.body, req.body['messenger user id']);
   res.setHeader('Content-Type', 'text/plain');
@@ -190,6 +251,7 @@ app.post('/sam/fuel/end_session', function(req, res) {
 });
 
 app.post('/sam/fuel/add_drink', function(req, res){
+  console.log('-------- ADD-DRINK -------')
   res.setHeader('Content-Type', 'text/plain');
   console.log(req.body);
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
@@ -221,9 +283,16 @@ app.post('/sam/fuel/add_drink', function(req, res){
             });
             res.status(200);
         } else {
+          var cocktail_slug = nlu_cocktail(req.body.alcohol_type);
+          var quantity = 0;
+          if (req.body.quantity != undefined && req.body.quantity != '') {
+            quantity = nlu_quantity(req.body.quantity);
+          } else {
+            quantity = cocktails[cocktail_slug].default_volume;
+          }
           Drink.create({
-            type: req.body.alcohol_type,
-            quantity: req.body.quantity,
+            type: cocktail_slug,
+            quantity: quantity,
             sessionId: session.dataValues.id
           }).then(() => {
             res.json({
@@ -237,7 +306,8 @@ app.post('/sam/fuel/add_drink', function(req, res){
   })
 })
 
-app.post('/sam/fuel/get_resume', function(req, res) {
+app.post('/sam/fuel/get_drinks_resume', function(req, res) {
+  console.log('-------- DRINKS-RESUME -------')
   res.setHeader('Content-Type', 'text/plain');
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
@@ -250,12 +320,19 @@ app.post('/sam/fuel/get_resume', function(req, res) {
         where: {userId: user.dataValues.id},
         order: [['createdAt', 'DESC']]
       }).then((session)=>{
-        console.log(session.get({plain: true}))
         Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
-          console.log(drinks[0]);
+          console.log(drinks[0], drinks[0].quantity);
           messages = []
+          var stacked = 0;
           for (var i=0; i<drinks.length; i++) {
-            messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + ' de ' + drinks[i].dataValues.type})
+            var ingredients = cocktails[drinks[i].type].ingredients;
+            var quantity = drinks[i].quantity;
+            console.log(ingredients.length);
+            for (var j=0; j<ingredients.length; j++) {
+              console.log(alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50)
+              stacked += alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50;
+            }
+            messages.push({'text': 'Un verre de '+ drinks[i].dataValues.quantity + 'mL de ' + cocktails[drinks[i].dataValues.type].name + ' (' + stacked +'g/L)'})
           }
           res.json({
             "messages": messages
@@ -269,150 +346,42 @@ app.post('/sam/fuel/get_resume', function(req, res) {
   })
 });
 
-//// OLDOLDOLDOLDOLDOLDOLDOLDOLD
-
-app.get('/new/:id/:name', function(req, res){
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200);
-  db.all("SELECT * FROM users WHERE ID=?",req.params.id, function(err, rows){
-    if (rows.length<=0) {
-      db.run("INSERT into users (ID, name) VALUES ($id, $name)", {'$id':req.params.id, '$name':req.params.name.replace(/\+/gi)}, function(err){console.log(this)});
-      res.json({
-        "messages":[
-          {'text': 'nouvel utilisateur créé'}
-        ]
-      });
-    }
-  });
-})
-
-app.get('/resume', function(req, res){
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200);
-  db.all("SELECT * FROM users", function(err, users) {
-    console.log(err, users, this);
-    total = {};
-    for (var i=0; i<users.length; i++) {
-      total[users[i].ID] = {'nb':0, 'name':users[i].name};
-      console.log(users[i]);
-    }
-    console.log(total);
-    db.all("SELECT * FROM times", function(err, rows){
-      console.log(err);
-      for (row in rows) {
-        if (rows[row].end != null) {
-          var user_id = String(rows[row].user_id);
-          if (total[user_id] != undefined) {
-            total[user_id]['nb'] += rows[row].end - rows[row].start;
-            console.log(total);
+app.post('/sam/fuel/get_level_resume', function(req, res) {
+  console.log('-------- LEVEL-RESUME -------')
+  first_check(req, res, function(req, res, user){
+    Session.findOne({
+      where: {userId: user.dataValues.id},
+      order: [['createdAt', 'DESC']]
+    }).then((session)=>{
+      Drink.findAll({
+        include: [Alcohol],
+        where: {sessionId: session.dataValues.id} })
+      .then(drinks => {
+        messages = []
+        var date = new Date()
+        var stacked = 0;
+        for (var i=0; i<drinks.length; i++) {
+          var ingredients = cocktails[drinks[i].type].ingredients;
+          console.log(ingredients);
+          var quantity = drinks[i].quantity;
+          console.log(ingredients.length);
+          for (var j=0; j<ingredients.length; j++) {
+            console.log(alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50)
+            stacked += alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50;
           }
         }
-      }
-      msg = []
-      for (i in total) {
-        console.log(i);
-        msg.push({'text':total[i]['name']+' cumule '+total[i]['nb']+' secondes perdues'});
-      }
-      res.json({
-        "set_attributes":
-          {
-
-          },
-        "messages":msg
-      });
-      res.end();
-      console.log('updated');
-    })
-
-  });
-})
-
-app.get('/stop/:id', function(req, res){
-  db = new sqlite3.Database('sambot.db');
-  var date = new Date();
-  var time2 = date.getTime();
-  var id = parseInt(req.params.id.replace(/\+/gi, " "));
-  db.all("select * from times where user_id = ? order by ID desc limit 1 ",id, function(err, rows){
-    time1 = parseInt(rows[0].start);
-    db.run("update times set end = $value where ID = $id", {'$id':rows[0].ID, '$value':time2}, function(err){
-      console.log(this, time1)
-      res.setHeader('Content-Type', 'text/plain');
-      res.status(200);
-      var diff = (time2-time1)/1000;
+        messages.push({'text': "cumul d'alcool de " + stacked +' g/L'});
         res.json({
-         "messages": [
-            {
-              "attachment":{
-                "type":"template",
-                "payload":{
-                  "template_type":"generic",
-                  "elements":[
-                    {
-                      "title":"voyons ce score...",
-                      "image_url":"",
-                      "buttons":[
-                        {
-                          "set_attributes":
-                          {
-                            "diff": diff
-                          },
-                          "type": "show_block",
-                          "block_name": "result",
-                          "title": "resultat"
-                        }]
-                    }]
-                }}
-            }]
+          "messages": messages
         });
-        res.end();
-        console.log('updated');
+        res.status(200);
+      })
     })
-
   });
-  db.close();
 });
 
-app.get('/start/:id', function(req, res){
-  db = new sqlite3.Database('sambot.db');
-  var date = new Date();
-  var time = parseInt(date.getTime());
-  var id = parseInt(req.params.id.replace(/\+/gi, " "));
-  //insert new time with time1 :
-  db.run("INSERT into \"times\" (user_id, start) VALUES ($id, $time)", {'$id':id, '$time':time}, function(err){
-    res.setHeader('Content-Type', 'text/plain');
-    console.log(this, err, time, id)
-    res.status(200);
-    res.json({
-       "messages": [
-          {
-            "attachment":{
-              "type":"template",
-              "payload":{
-                "template_type":"generic",
-                "elements":[
-                  {
-                    "title":"c'est parti !",
-                    "image_url":"http://www.lepoint.fr/images/2012/05/02/debat-566573-jpg_388849_660x281.JPG",
-                    "buttons":[
-                      {
-                        "set_attributes":
-                        {
-                          "time_id": this.lastID
-                        },
-                        "type": "show_block",
-                        "block_name": "stop_block",
-                        "title": "J'ai fini !"
-                      }]
-                  }]
-              }}
-          }]
-      });
-      res.end();
-      console.log('updated');
-  });
-  db.close();
+//// OLDOLDOLDOLDOLDOLDOLDOLDOLD
 
-});
 
 app.get('/', function(req, res) {
     res.render('tv.ejs');
