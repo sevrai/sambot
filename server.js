@@ -120,7 +120,7 @@ Session.sync({force: false}).then(() => {
   });
 });
 
-Drink.sync({force: false}).then(() => {
+Drink.sync({force: true}).then(() => {
   // Table created
   Drink.findAll().then(drinks => {
     // console.log(drinks)
@@ -147,11 +147,13 @@ function first_check(req, res, callback) {
   res.setHeader('Content-Type', 'text/plain');
   User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
+      console.log('no user in base');
       res.json({
         "redirect_to_blocks": ["Welcome message"]
       });
       res.status(200);
     } else {
+      console.log('user found');
       callback(req, res, user);
     }
   });
@@ -321,7 +323,6 @@ app.post('/sam/fuel/get_drinks_resume', function(req, res) {
         order: [['createdAt', 'DESC']]
       }).then((session)=>{
         Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
-          console.log(drinks[0], drinks[0].quantity);
           messages = []
           var stacked = 0;
           for (var i=0; i<drinks.length; i++) {

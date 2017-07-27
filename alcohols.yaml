@@ -26,7 +26,7 @@ whisky :
       name : whisky
       default_degree : 40.0
 vodka :
-  type :
+  types :
     default :
       name : vodka
       default_degree : 40.0
