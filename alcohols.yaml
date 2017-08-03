@@ -46,7 +46,6 @@ beer :
     brown-beer :
       name : bière brune
       default_degree : 6.0
-  brands :
 gin :
   types :
     default :
@@ -57,12 +56,6 @@ tequila :
     default :
       name : tequila
       default_degree : 40
-gin :
-  types :
-    default :
-      name : gin
-      default_degree : 37.5
-
 pastis :
   types :
     default :

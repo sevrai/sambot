@@ -27,10 +27,6 @@ null :
 
 pure-vodka :
   name : vodka
-  variants :
-  - label : vodka
-  - label : vodka pure
-  - label : un pur de vodka
   ingredients :
     - name : vodka
       quantity : 1.0
@@ -52,9 +48,6 @@ vodka-energy-drink :
 
 pure-whisky :
   name : whisky
-  variants :
-  - label : whisky
-  - label : sky
   ingredients :
   - name : whisky
     quantity : 1.0
