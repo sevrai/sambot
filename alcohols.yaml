@@ -1,3 +1,8 @@
+null :
+  types :
+    default :
+      name : rien
+      default_degree : 0.0
 rum :
   brands :
     saint-james :
@@ -13,7 +18,7 @@ rum :
       name : Rhum ambré
       default_degree : 50
     default :
-      name : Rhum
+      name : rhum
       default_degree : 40
 whisky :
   brands :
@@ -42,3 +47,24 @@ beer :
       name : bière brune
       default_degree : 6.0
   brands :
+gin :
+  types :
+    default :
+      name : gin
+      default_degree : 37.5
+tequila :
+  types :
+    default :
+      name : tequila
+      default_degree : 40
+gin :
+  types :
+    default :
+      name : gin
+      default_degree : 37.5
+
+pastis :
+  types :
+    default :
+      name : pastis
+      default_degree : 40

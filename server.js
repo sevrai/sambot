@@ -161,7 +161,8 @@ function first_check(req, res, callback) {
 function nlu_cocktail(user_input) {
   var keys = Object.keys(dico);
   console.log(keys)
-  var result = '';
+  user_input = user_input.toLowerCase();
+  var result = 'null';
   for (var i=0; i<keys.length; i++) {
     if (dico[keys[i]].includes(user_input)) {
       result = keys[i];
@@ -364,17 +365,27 @@ app.post('/sam/fuel/get_level_resume', function(req, res) {
         messages = []
         var date = new Date()
         var stacked = 0;
-        for (var i=0; i<drinks.length; i++) {
+        var current = 0;
+        drinks.push({createdAt: date});
+        for (var i=0; i<drinks.length-1; i++) {
           var ingredients = cocktails[drinks[i].type].ingredients;
+          var single = 0
           console.log(ingredients);
           var quantity = drinks[i].quantity;
           console.log(ingredients.length);
           for (var j=0; j<ingredients.length; j++) {
             console.log(alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50)
-            stacked += alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50;
+            single += alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50;
           }
+          var laps = drinks[i].createdAt - drinks[i+1].createdAt;
+          var decrease = laps*0.15/(3.6e6)
+          if (decrease > single) {
+            decrease = single;
+          }
+          stacked += single - decrease;
         }
         messages.push({'text': "cumul d'alcool de " + stacked +' g/L'});
+        messages.push({'text': "taux approximatif actuel de " + current +' g/L'});
         res.json({
           "messages": messages
         });

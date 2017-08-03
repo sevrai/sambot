@@ -18,6 +18,13 @@
 #     quantity : 0.66
 #   default_volume : 120
 #
+null :
+  name : inconnu
+  ingredients :
+  - name : null
+    quantity : 1.0
+  default_volume : 0
+
 pure-vodka :
   name : vodka
   variants :
@@ -31,9 +38,17 @@ pure-vodka :
 
 vodka-juice :
   name : Vodka jus de fruit
-  variants :
-  - label : vodka pomme
-  - TODODODODODODODODO
+  ingredients :
+  - name : vodka
+    quantity : 0.3
+  default_volume : 120
+
+vodka-energy-drink :
+  name : Vodka RedBull
+  ingredients :
+  - name : vodka
+    quantity : 0.45
+  default_volume : 120
 
 pure-whisky :
   name : whisky
@@ -65,3 +80,24 @@ ti-punch :
   - name : rum
     quantity : 0.7
   default_volume : 50
+
+pure-gin :
+  name : gin
+  ingredients :
+  - name : gin
+    quantity : 1.0
+  default_volume : 40
+
+gin_tonic :
+  name : gin tonic
+  ingredients :
+  - name : gin
+    quantity : 0.4
+  default_volume : 60
+
+pastis-water :
+  name : pastouret
+  ingredients :
+  - name : pastis
+    quantity : 0.25
+  default_volume : 120

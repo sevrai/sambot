@@ -1,21 +1,23 @@
 pure-vodka :
 - vodka
-- Vodka
 - de la vodka
+- une vodka
 pure-whisky :
 - whisky
-- Whisky
+- du whisky
+- un whisky
 - Whiskey
 - whiskey
 - wisky
 - Wisky
 - sky
-- Sky
+- du sky
+- un sky
 beer :
 - bière
 - biere
-- Bière
-- biere
+- de la bière
+- une biere
 - une pinte
 - pinte
 - demi
@@ -31,9 +33,53 @@ ti-punch :
 - un ti-punch
 - un tipunch
 - ti-punch
-- Ti-punch
 - tipunch
-- Tipunch
 - \'ti-punch
 - ti-puch
 - tipuch
+vodka-juice :
+- vodka pomme
+- vodka orange
+- vodka citron
+- vodka paquito
+- vodka chweppes
+- vodka shweppes
+- vodka schwepps
+- vodka schweppes
+- vodka multi
+- vodka mulifruit
+- vodka ananas
+vodka-energy-drink :
+- vodka redbull
+- vodka red bull
+- vodka monster
+- vodka truc de fou
+- vodka energy drink
+pure-gin :
+- un gin
+- du gin
+- gin
+pastis-water :
+- pastaga
+- du pastaga
+- pastis
+- un pastis
+- du pastis
+- ricard
+- un ricard
+- du ricard
+- pastouret
+- un pastouret
+- du pastouret
+- 51
+- du 51
+- pastis duval
+- unpastis duval
+- un jaune
+gin-tonic :
+- gin tonic
+- gin schweppes
+- ginto
+- un ginto
+- ginto'
+- gin-to
