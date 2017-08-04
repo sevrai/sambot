@@ -411,7 +411,7 @@ app.get('/sam/fuel/provide_cocktail', function(req, res) {
     "attachment": {
       "payload":{
         "template_type": "button",
-        "text": "Tout de suite je pense à un verre de  " + cocktail_infos.name + '. Partant ?',
+        "text": "Tout de suite je pense à un verre de " + cocktail_infos.name + '. Partant ?',
         "buttons": [
           {
             "url": "https://lamisambot.herokuapp.com/sam/fuel/cocktail_recipe/?name="+drinks_list[rand],
@@ -454,6 +454,7 @@ app.get('/sam/fuel/cocktail_recipe', function(req, res) {
     elements.push(element);
   }
   var ingredients = cocktails[cocktail_name].ingredients_soft;
+  if (ingredients == undefined) {ingredients = [];}
   for (var j=0; j<ingredients.length; j++) {
     var title = softs[ingredients[j].name].name;
     var quantity = ingredients[j].quantity
