@@ -18,6 +18,7 @@
 #     quantity : 0.66
 #   default_volume : 120
 #
+##### Null type #####
 null :
   name : inconnu
   ingredients :
@@ -25,18 +26,49 @@ null :
     quantity : 1.0
   default_volume : 0
 
+##### Pure glass #####
 pure-vodka :
   name : vodka
   ingredients :
     - name : vodka
       quantity : 1.0
   default_volume : 40
+pure-whisky :
+  name : whisky
+  ingredients :
+  - name : whisky
+    quantity : 1.0
+  default_volume : 40
+pure-rum :
+  name : rhum
+  ingredients :
+  - name : rum
+    quantity : 1.0
+  default_volume : 40
+pure-gin :
+  name : gin
+  ingredients :
+  - name : gin
+    quantity : 1.0
+  default_volume : 40
+beer :
+  name : bière
+  ingredients :
+  - name : beer
+    quantity : 1.0
+  default_volume : 250
+pure-wine :
+  name : vin
 
+##### vodka cocktails #####
 vodka-juice :
   name : Vodka jus de fruit
   ingredients :
   - name : vodka
     quantity : 0.3
+  ingredients_soft :
+  - name : fruit-juice
+    quantity : 0.7
   default_volume : 120
 
 vodka-energy-drink :
@@ -44,53 +76,43 @@ vodka-energy-drink :
   ingredients :
   - name : vodka
     quantity : 0.45
+  ingredients_soft :
+  - name : energy-drink
+    quantity : 0.55
   default_volume : 120
 
-pure-whisky :
-  name : whisky
-  ingredients :
-  - name : whisky
-    quantity : 1.0
-  default_volume : 40
-
-beer :
-  name : bière
-  ingredients :
-  - name : beer
-    quantity : 1.0
-  default_volume : 250
-
-pure-rum :
-  name : rhum
-  ingredients :
-  - name : rum
-    quantity : 1.0
-  default_volume : 40
-
+##### Rum cocktails #####
 ti-punch :
   name : \'ti-punch
   ingredients :
   - name : rum
     quantity : 0.7
+  ingredients_soft :
+  - name : liquid-sugar
+    quantity : 0.2
+  - name : lime
+    quantity : 0.1
+    quantity_label : une rondelle
   default_volume : 50
 
-pure-gin :
-  name : gin
-  ingredients :
-  - name : gin
-    quantity : 1.0
-  default_volume : 40
-
-gin_tonic :
+##### Gin cocktails #####
+gin-tonic :
   name : gin tonic
   ingredients :
   - name : gin
     quantity : 0.4
   default_volume : 60
+  ingredients_soft :
+  - name : tonic
+    quantity : 0.6
 
 pastis-water :
   name : pastouret
   ingredients :
   - name : pastis
     quantity : 0.25
+  ingredients_soft :
+  - name : water
+    quantity : 0.75
+    quantity_label : selon tes préférences
   default_volume : 120

@@ -1,0 +1,12 @@
+liquid-sugar :
+  name : sucre de canne
+energy-drink :
+  name : boisson énergisante
+fruit-juice :
+  name : jus de fruit
+lime :
+  name : citron vert
+tonic :
+  name : Schweppes tonic
+water :
+  name : l\'eau

@@ -61,3 +61,8 @@ pastis :
     default :
       name : pastis
       default_degree : 40
+wine :
+  types :
+    default :
+      name : vin
+      default_degree : 12

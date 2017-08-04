@@ -25,6 +25,7 @@ app.use(function(req, res, next) {
 
 var cocktails = yaml.readSync('cocktails.yaml');
 var alcohols = yaml.readSync('alcohols.yaml');
+var softs = yaml.readSync('softs.yaml');
 var dico = yaml.readSync('dict.yaml');
 console.log(alcohols.whisky.types)
 //initialization of database
@@ -170,9 +171,13 @@ function nlu_cocktail(user_input) {
   }
   return result
 }
-function nlu_quantity(user_input) {
+function nlu_quantity(user_input, cocktail_slug) {
   console.log(user_input)
-  return parseFloat(user_input)
+  var quantity = parseFloat(user_input)
+  if (isNaN(quantity)) {
+    quantity = cocktails[cocktail_slug].default_volume;
+  }
+  return quantity
 }
 
 /// POST/GET methods
@@ -290,12 +295,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
             res.status(200);
         } else {
           var cocktail_slug = nlu_cocktail(req.body.alcohol_type);
-          var quantity = 0;
-          if (req.body.quantity != undefined && req.body.quantity != '') {
-            quantity = nlu_quantity(req.body.quantity);
-          } else {
-            quantity = cocktails[cocktail_slug].default_volume;
-          }
+          var quantity = nlu_quantity(req.body.quantity, req.body.alcohol_type);
           Drink.create({
             type: cocktail_slug,
             quantity: quantity,
@@ -377,12 +377,13 @@ app.post('/sam/fuel/get_level_resume', function(req, res) {
             console.log(alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50)
             single += alcohols[ingredients[j].name].types['default'].default_degree * 0.01 * quantity * ingredients[j].quantity * 0.8 /50;
           }
-          var laps = drinks[i].createdAt - drinks[i+1].createdAt;
+          var laps = drinks[i+1].createdAt - drinks[i].createdAt;
           var decrease = laps*0.15/(3.6e6)
           if (decrease > single) {
             decrease = single;
           }
-          stacked += single - decrease;
+          current += single - decrease;
+          stacked += single;
         }
         messages.push({'text': "cumul d'alcool de " + stacked +' g/L'});
         messages.push({'text': "taux approximatif actuel de " + current +' g/L'});
@@ -393,6 +394,96 @@ app.post('/sam/fuel/get_level_resume', function(req, res) {
       })
     })
   });
+});
+
+app.get('/sam/fuel/provide_cocktail', function(req, res) {
+  console.log('-------- PROVIDE-COCKTAIL -------')
+  var drinks_list = Object.keys(cocktails);
+  console.log(drinks_list);
+  var drinks_number = drinks_list.length;
+  console.log(drinks_number);
+  var rand = Math.floor(Math.random()*(drinks_number-1))+1;
+  console.log(rand);
+  var cocktail_infos = cocktails[drinks_list[rand]];
+  console.log(cocktail_infos);
+  res.json({
+   "messages": [{
+    "attachment": {
+      "payload":{
+        "template_type": "button",
+        "text": "Tout de suite je pense à un verre de  " + cocktail_infos.name + '. Partant ?',
+        "buttons": [
+          {
+            "url": "https://lamisambot.herokuapp.com/sam/fuel/cocktail_recipe/?name="+drinks_list[rand],
+            "type":"json_plugin_url",
+            "title":"La recette"
+          },
+          {
+            "url": "https://lamisambot.herokuapp.com/sam/fuel/provide_cocktail",
+            "type":"json_plugin_url",
+            "title":"Un autre"
+          }
+        ]
+      },
+      "type": "template"
+    }
+   }]
+  });
+  res.status(200);
+});
+
+app.get('/sam/fuel/cocktail_recipe', function(req, res) {
+  console.log('-------- COCKTAIL-RECIPE -------');
+  cocktail_name = req.query.name;
+  var ingredients = cocktails[cocktail_name].ingredients;
+  var elements = [];
+  for (var j=0; j<ingredients.length; j++) {
+    var title = alcohols[ingredients[j].name].types['default'].name;
+    var quantity = ingredients[j].quantity
+    var default_volume = cocktails[cocktail_name].default_volume
+    var quantity_label = ingredients[j].quantity_label
+    if (quantity_label == undefined) {
+      subtitle = quantity * 10 + ' volumes (' + default_volume * quantity/10 + ' cL)'
+    } else {
+      subtitle = quantity_label +' (' + default_volume * quantity/10 + ' cL)'
+    }
+    var element = {
+                    "title":title,
+                    "subtitle":subtitle,
+                  }
+    elements.push(element);
+  }
+  var ingredients = cocktails[cocktail_name].ingredients_soft;
+  for (var j=0; j<ingredients.length; j++) {
+    var title = softs[ingredients[j].name].name;
+    var quantity = ingredients[j].quantity
+    var default_volume = cocktails[cocktail_name].default_volume
+    var quantity_label = ingredients[j].quantity_label
+    if (quantity_label == undefined) {
+      subtitle = quantity * 10 + ' volumes (' + default_volume * quantity/10 + ' cL)'
+    } else {
+      subtitle = quantity_label +' (' + default_volume * quantity/10 + ' cL)'
+    }
+    var element = {
+                    "title":title,
+                    "subtitle":subtitle,
+                  }
+    elements.push(element);
+  }
+  res.json({
+   "messages": [
+      {
+        "attachment":{
+          "type":"template",
+          "payload":{
+            "template_type":"generic",
+            "elements": elements
+          }
+        }
+      }
+    ]
+  });
+  res.status(200);
 });
 
 //// OLDOLDOLDOLDOLDOLDOLDOLDOLD
