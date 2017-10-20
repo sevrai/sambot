@@ -2,6 +2,7 @@
 var express = require('express');
 var http = require('http');
 var sqlite3 = require('sqlite3').verbose();
+var pg = require('pg');
 // var db = new sqlite3.Database('sambot.db');
 var Sequelize = require('sequelize');
 
@@ -9,7 +10,7 @@ var request = require('request');
 var app = express();
 var bodyParser = require('body-parser')
 var yaml = require('node-yaml')
-
+var db = require('./models');
 // JSON BODY PARSER
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -29,115 +30,122 @@ var softs = yaml.readSync('softs.yaml');
 var dico = yaml.readSync('dict.yaml');
 console.log(alcohols.whisky.types)
 //initialization of database
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'sqlite',
-
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000
-  },
-  // SQLite only
-  storage: 'test.db'
-});
-////
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
+/// add ////
+db.sequelize.sync().then(function() {
+  http.createServer(app).listen(app.get('port'), function(){
+    console.log('Express server listening on port ' + app.get('port'));
   });
-////
-const User = sequelize.define('users', {
-  firstName: {
-    type: Sequelize.STRING
-  },
-  messengerId: {
-    type: Sequelize.INTEGER
-  }
 });
+/// end_add ////
+// const sequelize = new Sequelize('database', 'username', 'password', {
+//   host: 'localhost',
+//   dialect: 'sqlite',
+//
+//   pool: {
+//     max: 5,
+//     min: 0,
+//     idle: 10000
+//   },
+//   // SQLite only
+//   storage: 'test.db'
+// });
+// ////
+// sequelize.authenticate()
+//   .then(() => {
+//     console.log('Connection has been established successfully.');
+//   })
+//   .catch(err => {
+//     console.error('Unable to connect to the database:', err);
+//   });
+// ////
+// const User = sequelize.define('users', {
+//   firstName: {
+//     type: Sequelize.STRING
+//   },
+//   messengerId: {
+//     type: Sequelize.INTEGER
+//   }
+// });
+//
+// const Session = sequelize.define('sessions', {
+//   endedAt: {
+//     type: Sequelize.DATE,
+//     allowNull: true
+//   },
+//   userId: {
+//     type: Sequelize.INTEGER,
+//     references: {
+//       model: User,
+//       key: 'id'
+//     },
+//     field: 'user_id'
+//   }
+// });
 
-const Session = sequelize.define('sessions', {
-  endedAt: {
-    type: Sequelize.DATE,
-    allowNull: true
-  },
-  userId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    },
-    field: 'user_id'
-  }
-});
+// const Drink = sequelize.define('drinks', {
+//   type: {
+//     type: Sequelize.STRING,
+//     allowNull: false,
+//     defaultValue: 'liquide'
+//   },
+//   quantity: {
+//     type: Sequelize.FLOAT,
+//     allowNull: false,
+//     defaultValue: '4 cL'
+//   },
+//   sessionId: {
+//     type: Sequelize.INTEGER,
+//     references: {
+//       model: Session,
+//       key: 'id'
+//     },
+//     field: 'session_id'
+//   }
+// });
 
-const Drink = sequelize.define('drinks', {
-  type: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    defaultValue: 'liquide'
-  },
-  quantity: {
-    type: Sequelize.FLOAT,
-    allowNull: false,
-    defaultValue: '4 cL'
-  },
-  sessionId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: Session,
-      key: 'id'
-    },
-    field: 'session_id'
-  }
-});
+// const Alcohol = sequelize.define('alcohols', {
+//   name: {
+//     type: Sequelize.STRING
+//   },
+//   degree: {
+//     type: Sequelize.FLOAT
+//   }
+//
+// });
 
-const Alcohol = sequelize.define('alcohols', {
-  name: {
-    type: Sequelize.STRING
-  },
-  degree: {
-    type: Sequelize.FLOAT
-  }
+db.Drink.belongsTo(db.Alcohol);
 
-});
-
-Drink.belongsTo(Alcohol);
-
-User.sync({force: false}).then(() => {
+db.User.sync({force: false}).then(() => {
   // Table created
-  User.findAll().then(users => {
+  db.User.findAll().then(users => {
     // console.log(users)
   });
 });
 
-Session.sync({force: false}).then(() => {
+db.Session.sync({force: false}).then(() => {
   // Table created
-  Session.findAll().then(sessions => {
+  db.Session.findAll().then(sessions => {
     // console.log(sessions)
   });
 });
 
-Drink.sync({force: true}).then(() => {
+db.Drink.sync({force: true}).then(() => {
   // Table created
-  Drink.findAll().then(drinks => {
+  db.Drink.findAll().then(drinks => {
     // console.log(drinks)
   });
 });
 
-Alcohol.sync({force: false}).then(() => {
-  Alcohol.create({
+db.Alcohol.sync({force: false}).then(() => {
+  db.Alcohol.create({
     name: 'vodka',
     degree: 37.5
   }).then();
-  Alcohol.create({
+  db.Alcohol.create({
     name: 'champagne',
     degree: 12.5
   }).then();
-  Alcohol.create({
+  db.Alcohol.create({
     name: 'coca',
     degree: 0
   }).then();
@@ -146,7 +154,7 @@ Alcohol.sync({force: false}).then(() => {
 ////// misc functions
 function first_check(req, res, callback) {
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+  db.User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       console.log('no user in base');
       res.json({
@@ -185,7 +193,7 @@ app.post('/sam/fuel/new_user', function(req, res){
   console.log('-------- NEW-USER -------')
   console.log(req.body, req.body['messenger user id']);
   res.setHeader('Content-Type', 'text/plain');
-  User.findOrCreate({where: {messengerId: req.body['messenger user id']}, defaults: {firstName: req.body['first name']}})
+  db.User.findOrCreate({where: {messengerId: req.body['messenger user id']}, defaults: {firstName: req.body['first name']}})
     .spread((user, created) => {
       console.log(user.get({
         plain: true
@@ -201,14 +209,14 @@ app.post('/sam/fuel/new_user', function(req, res){
 app.post('/sam/fuel/start_session', function(req, res) {
   console.log('-------- START-SESSION -------')
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+  db.User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
       });
       res.status(200);
     } else {
-      Session.findOrCreate({where: {userId: user.dataValues.id, endedAt: null}}).spread((user, created)=>{
+      db.Session.findOrCreate({where: {userId: user.dataValues.id, endedAt: null}}).spread((user, created)=>{
         console.log(user.get({
           plain: true
         }))
@@ -231,14 +239,14 @@ app.post('/sam/fuel/end_session', function(req, res) {
   console.log('-------- END-SESSION -------')
   res.setHeader('Content-Type', 'text/plain');
   var date = new Date();
-  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+  db.User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
       });
       res.status(200);
     } else {
-      Session.update({endedAt: date}, {where: {userId: user.dataValues.id, endedAt: null}}).then((count)=>{
+      db.Session.update({endedAt: date}, {where: {userId: user.dataValues.id, endedAt: null}}).then((count)=>{
         console.log(count);
         if(count == 1){
           res.json({
@@ -265,14 +273,14 @@ app.post('/sam/fuel/add_drink', function(req, res){
   console.log('-------- ADD-DRINK -------')
   res.setHeader('Content-Type', 'text/plain');
   console.log(req.body);
-  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+  db.User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
       });
       res.status(200);
     } else {
-      Session.findOne({where: {userId: user.dataValues.id, endedAt: null}}).then((session)=>{
+      db.Session.findOne({where: {userId: user.dataValues.id, endedAt: null}}).then((session)=>{
         console.log(session.dataValues);
         if(session == null) {
           res.json({
@@ -296,7 +304,7 @@ app.post('/sam/fuel/add_drink', function(req, res){
         } else {
           var cocktail_slug = nlu_cocktail(req.body.alcohol_type);
           var quantity = nlu_quantity(req.body.quantity, req.body.alcohol_type);
-          Drink.create({
+          db.Drink.create({
             type: cocktail_slug,
             quantity: quantity,
             sessionId: session.dataValues.id
@@ -315,18 +323,18 @@ app.post('/sam/fuel/add_drink', function(req, res){
 app.post('/sam/fuel/get_drinks_resume', function(req, res) {
   console.log('-------- DRINKS-RESUME -------')
   res.setHeader('Content-Type', 'text/plain');
-  User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
+  db.User.findOne({where: {messengerId: req.body['messenger user id']}, }).then(user => {
     if (user == null) {
       res.json({
         "redirect_to_blocks": ["Welcome message"]
       });
       res.status(200);
     } else {
-      Session.findOne({
+      db.Session.findOne({
         where: {userId: user.dataValues.id},
         order: [['createdAt', 'DESC']]
       }).then((session)=>{
-        Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
+        db.Drink.findAll({where: {sessionId: session.dataValues.id} }).then(drinks => {
           messages = []
           for (var i=0; i<drinks.length; i++) {
             var ingredients = cocktails[drinks[i].type].ingredients;
@@ -354,12 +362,12 @@ app.post('/sam/fuel/get_drinks_resume', function(req, res) {
 app.post('/sam/fuel/get_level_resume', function(req, res) {
   console.log('-------- LEVEL-RESUME -------')
   first_check(req, res, function(req, res, user){
-    Session.findOne({
+    db.Session.findOne({
       where: {userId: user.dataValues.id},
       order: [['createdAt', 'DESC']]
     }).then((session)=>{
-      Drink.findAll({
-        include: [Alcohol],
+      db.Drink.findAll({
+        include: [db.Alcohol],
         where: {sessionId: session.dataValues.id} })
       .then(drinks => {
         messages = []
