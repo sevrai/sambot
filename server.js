@@ -36,6 +36,7 @@ db.sequelize.sync().then(function() {
     console.log('Express server listening on port ' + app.get('port'));
   });
 });
+console.log(Object.keys(db.Session));
 /// end_add ////
 // const sequelize = new Sequelize('database', 'username', 'password', {
 //   host: 'localhost',
@@ -122,7 +123,7 @@ db.User.sync({force: false}).then(() => {
   });
 });
 
-db.Session.sync({force: false}).then(() => {
+db.Session.sync({force: true}).then(() => {
   // Table created
   db.Session.findAll().then(sessions => {
     // console.log(sessions)
@@ -135,7 +136,7 @@ db.Drink.sync({force: true}).then(() => {
     // console.log(drinks)
   });
 });
-
+//
 db.Alcohol.sync({force: false}).then(() => {
   db.Alcohol.create({
     name: 'vodka',
